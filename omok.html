@@ -1,0 +1,113 @@
+
+<style>
+.container {width: 150px; text-align:right;}
+#omok-table { display: flex; width: 150px; flex-wrap: wrap; background-color: tan; }
+.omok-box { position:relative; width: 30px; height: 30px; border: solid 1px saddlebrown;}
+.omok-box p {font-size: 25px; color: transparent; text-shadow: 0 0 0 black; margin:0; position: absolute; }
+.omok-box p.white { text-shadow: 0 0 0 white;}
+.btn-box {padding-top: 10px}
+</style>
+
+<div class="container">
+	<div id="omok-table"></div>
+	<div class="btn-box">
+		<button>시작</button>
+	</div>
+</div>
+
+<script>
+
+	// init 
+
+	// 화면에서 2차원 배열에 해당하는 영역을 그린다 
+	let arr = Array.from(Array(5), () => Array(5).fill('0'))
+	let aIdx = 0, bIdx = 0;
+	const whiteArr = [], blackArr = []
+
+	// 흰색에게는 1, 검은색에게는 2를 부여한다 
+	let turn = 1;
+
+	for (const a of arr) {
+	 	for(const b of a){
+	 		// console.log("좌표" + aIdx + ", " + (bIdx-(aIdx*15)) );
+ 	 		let newOmokBox = document.createElement("div");
+	 		let table = document.querySelector("#omok-table");
+		 	newOmokBox.setAttribute("class","omok-box");
+		 	newOmokBox.setAttribute("id",aIdx +"-" +bIdx);
+		 	newOmokBox.onclick = clickBox;
+		 	table.appendChild(newOmokBox);
+		 	bIdx++;
+	 	}
+	 	aIdx++; 
+	 	bIdx = 0;
+	}
+
+	function clickBox() {
+		debugger; 
+
+	// 영역을 클릭했을 경우, 해당 인덱스를 추출한다 
+	// 영역에 id 값을 부여하는 형식이 가장 좋을 것 같다 
+
+		console.log(this.id)
+
+		if(this.hasChildNodes()){ return; }
+
+		let calArr = whiteArr
+
+		let rock = document.createElement('p'); 
+		rock.innerText = "●";
+
+		if(turn == 1) {
+			// 백일 경우, 흑으로 턴 변경, css 추가
+			turn = 2;
+			rock.setAttribute("class","white");
+		}else {
+			// 흑일 경우, 흑으로 배열 변경, 백으로 턴 변경
+			calArr = blackArr
+			turn = 1;
+			
+		}
+
+			// 1. 해당 행과 열에 연속되어 있는지 확인한다. 
+			// 2. 없다면, 해당 id 값을 배열에 더한다 
+
+			this.appendChild(rock); 
+			calArr.push(this.id)
+			calArr.sort()
+
+			if(calArr.length >= 5 ){
+				
+			}
+
+			const idArr = this.id.split("-")
+			const yeol = idArr[0]
+			const hang = idArr[1]
+
+			let yeolCnt = 0 
+			let hangCnt = 0
+
+			let yeolArr = [] 
+			let hangArr = []
+
+			let cnt = 0;
+
+			for (let i of calArr) {
+
+				if(i.startsWith(hang)) {
+					// 사실 여기서 배열 안 만들고 배열을 sort한 다음, cnt에서 뽑은 인덱스 값을 연달아서 쓰고 싶다.
+					yeolArr.push(i)
+				}
+
+				if(i.endsWith(yeol)) {
+					hangArr.push(i)
+				}
+				cnt++;
+			}
+
+
+
+
+	}
+
+</script>
+
