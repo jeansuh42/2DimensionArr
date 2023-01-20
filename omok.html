@@ -1,7 +1,7 @@
 
 <style>
-.container {width: 150px; text-align:right;}
-#omok-table { display: flex; width: 150px; flex-wrap: wrap; background-color: tan; }
+.container {width: 500px; text-align:right;}
+#omok-table { display: flex; width: 500px; flex-wrap: wrap; background-color: tan; }
 .omok-box { position:relative; width: 30px; height: 30px; border: solid 1px saddlebrown;}
 .omok-box p {font-size: 25px; color: transparent; text-shadow: 0 0 0 black; margin:0; position: absolute; }
 .omok-box p.white { text-shadow: 0 0 0 white;}
@@ -20,7 +20,7 @@
 	// init 
 
 	// 화면에서 2차원 배열에 해당하는 영역을 그린다 
-	let arr = Array.from(Array(5), () => Array(5).fill('0'))
+	let arr = Array.from(Array(15), () => Array(15).fill('0'))
 	let aIdx = 0, bIdx = 0;
 	const whiteArr = [], blackArr = []
 
@@ -95,11 +95,21 @@
 
 				if(i.startsWith(hang)) {
 					// 사실 여기서 배열 안 만들고 배열을 sort한 다음, cnt에서 뽑은 인덱스 값을 연달아서 쓰고 싶다.
-					yeolArr.push(i)
+					// yeolArr.push(i)
+					let startCnt = calArr.length - cnt;
+					while(startCnt == 0){
+						if(calArr[cnt]) { 
+							yeolCnt++;
+							startCnt--;
+						} else {
+							break;
+						}
+					}
+
 				}
 
 				if(i.endsWith(yeol)) {
-					hangArr.push(i)
+					// hangArr.push(i)
 				}
 				cnt++;
 			}
