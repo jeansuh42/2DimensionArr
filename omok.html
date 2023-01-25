@@ -1,15 +1,24 @@
 
 <style>
+p {margin:0;}
+body {margin:0;}
 .container {width: 500px; text-align:right;}
-#omok-table { display: flex; width: 500px; flex-wrap: wrap; background-color: tan; }
+#omok-table { display: flex; width: 480px; flex-wrap: wrap; background-color: tan; }
+#dim { position: absolute; background-color: rgba(0,0,0,0.3); width: 480px; height: 480px; top:0; left:0; display: flex; justify-content: center; align-items: center;}
+#dim div { color: white; font-weight: bold; font-size: 50px; }
+#dim div p { text-align: center; }
 .omok-box { position:relative; width: 30px; height: 30px; border: solid 1px saddlebrown;}
 .omok-box p {font-size: 25px; color: transparent; text-shadow: 0 0 0 black; margin:0; position: absolute; }
 .omok-box p.white { text-shadow: 0 0 0 white;}
 .btn-box {padding-top: 10px}
+.rock.black {color:black;}
 </style>
 
 <div class="container">
 	<div id="omok-table"></div>
+	<div id="dim" style="display:none">
+		<div><p class="rock">●</p>WIN</div>
+	</div>
 	<div class="btn-box">
 		<button>시작</button>
 	</div>
@@ -19,27 +28,52 @@
 
 	// init 
 
+	// 룰을 먼저 적는다 -> 적어야 쪼갤 수 있다 
+	// 1. 칸수는 15*15를 기본으로 한다  
+	// 2. 플레이어 둘이 턴제로 알을 놓는다.
+	// 3. 알은 빈 공간에만 둘 수 있다. 
+	// 4. 3*3 제약 조건이 있다.
+		// 3*3 1바퀴를 돌리면서 탐색 -> 2개 감지 
+	// 5. 가로 / 세로 / 대각선으로 같은 색의 돌이 5개 연속될 경우 승리한다. 
+
+	// 4/5의 공통요건
+		// 1. 탐색 범위 
+		// 2. U D fucntion -> 범위를 탐색한다: 탐색 함수 
+
+
+	let arr, whiteArr, blackArr;
+	let turn, arrCnt;
+
+	init(15);
+
 	// 화면에서 2차원 배열에 해당하는 영역을 그린다 
-	let arr = Array.from(Array(15), () => Array(15).fill('0'))
-	let aIdx = 0, bIdx = 0;
-	const whiteArr = [], blackArr = []
+	function init(initCnt) {
 
-	// 흰색에게는 1, 검은색에게는 2를 부여한다 
-	let turn = 1;
+		arrCnt = initCnt;
 
-	for (const a of arr) {
-	 	for(const b of a){
-	 		// console.log("좌표" + aIdx + ", " + (bIdx-(aIdx*15)) );
- 	 		let newOmokBox = document.createElement("div");
-	 		let table = document.querySelector("#omok-table");
-		 	newOmokBox.setAttribute("class","omok-box");
-		 	newOmokBox.setAttribute("id",aIdx +"-" +bIdx);
-		 	newOmokBox.onclick = clickBox;
-		 	table.appendChild(newOmokBox);
-		 	bIdx++;
-	 	}
-	 	aIdx++; 
-	 	bIdx = 0;
+		arr = Array.from(Array(arrCnt), () => Array(arrCnt).fill('0'));
+		let aIdx = 0, bIdx = 0;
+
+		whiteArr = [];
+		blackArr = [];
+		turn = 1;
+		
+		// 흰색에게는 1, 검은색에게는 2를 부여한다 
+	
+		for (const a of arr) {
+		 	for(const b of a){
+	 	 		let newOmokBox = document.createElement("div");
+		 		let table = document.querySelector("#omok-table");
+			 	newOmokBox.setAttribute("class", "omok-box");
+			 	newOmokBox.setAttribute("id", aIdx + "-" + bIdx);
+			 	// 기능은 분리해야 한다 
+			 	newOmokBox.onclick = clickBox;
+			 	table.appendChild(newOmokBox);
+			 	bIdx ++;
+		 	}
+		 	aIdx ++; 
+		 	bIdx = 0;
+		}
 	}
 
 	function clickBox() {
@@ -48,11 +82,14 @@
 	// 영역을 클릭했을 경우, 해당 인덱스를 추출한다 
 	// 영역에 id 값을 부여하는 형식이 가장 좋을 것 같다 
 
-		console.log(this.id)
+		// this => 변수 받아서 처리할 것
+
+		that = this 
+		console.log(this.id); 
 
 		if(this.hasChildNodes()){ return; }
 
-		let calArr = whiteArr
+		let calArr = whiteArr;
 
 		let rock = document.createElement('p'); 
 		rock.innerText = "●";
@@ -63,59 +100,89 @@
 			rock.setAttribute("class","white");
 		}else {
 			// 흑일 경우, 흑으로 배열 변경, 백으로 턴 변경
-			calArr = blackArr
+			calArr = blackArr;
 			turn = 1;
-			
 		}
 
-			// 1. 해당 행과 열에 연속되어 있는지 확인한다. 
-			// 2. 없다면, 해당 id 값을 배열에 더한다 
+		// 1. 해당 행과 열에 연속되어 있는지 확인한다. 
+		// 2. 없다면, 해당 id 값을 배열에 더한다 
 
-			this.appendChild(rock); 
-			calArr.push(this.id)
-			calArr.sort()
+		this.appendChild(rock); 
+		calArr.push(this.id);
 
-			if(calArr.length >= 5 ){
+		const idArr = this.id.split("-");
+		const yeol = Number(idArr[0]);
+		const hang = Number(idArr[1]);
+
+		arr[yeol][hang] = turn;
+
+		if(calArr.length >= 5){
+
+			// 열 반복 여부 
+			let cnt = 0; 
+
+			let min = yeol-4 > 0 ? yeol-4 : 0; // 열 상 
+			let max = yeol+4 < arrCnt ? yeol+4 : arrCnt; // 열 하 
 				
+			for (i = min ; i < max ; i ++) {
+				if (arr[i][hang] == turn)  cnt++;
 			}
 
-			const idArr = this.id.split("-")
-			const yeol = idArr[0]
-			const hang = idArr[1]
+			if (cnt == 5) { 
+				end();
+			}else {
 
-			let yeolCnt = 0 
-			let hangCnt = 0
+				// 행 반복 여부 
 
-			let yeolArr = [] 
-			let hangArr = []
+				cnt = 0 
+				min = hang-4 > 0 ? hang-4 : 0; // 행 상 
+				max = hang+4 < arrCnt ? hang+4 : arrCnt; // 행 하 
 
-			let cnt = 0;
 
-			for (let i of calArr) {
+				for (i = min ; i < max ; i ++) {
+					if (arr[yeol][i] == turn) cnt++;
+				}
 
-				if(i.startsWith(hang)) {
-					// 사실 여기서 배열 안 만들고 배열을 sort한 다음, cnt에서 뽑은 인덱스 값을 연달아서 쓰고 싶다.
-					// yeolArr.push(i)
-					let startCnt = calArr.length - cnt;
-					while(startCnt == 0){
-						if(calArr[cnt]) { 
-							yeolCnt++;
-							startCnt--;
-						} else {
-							break;
-						}
+
+				if (cnt == 5) { 
+					end()
+				}else {
+
+					// 대각선 
+					let yeolMax = yeol + 4 > arrCnt ? arrCnt : yeol + 4;
+					let yeolMin = yeol - 4 < 0 ? 0 : yeol - 4;
+					let hangMax = hang + 4 > arrCnt ? arrCnt : hang + 4;
+					let hangMin = hang - 4 < 0 ? 0 : hang - 4;
+
+					const diagonalMin = `${yeolMax}-${hangMin}`
+					const diagonalMax = `${yeolMin}-${hangMax}`
+
+					for ( i = yeolMax ; i > yeol ; i -- ) {
+						if (arr[i][hangMin] == turn) cnt++;
+						hangMin++;
 					}
 
-				}
 
-				if(i.endsWith(yeol)) {
-					// hangArr.push(i)
+					for ( i = hangMax ; i > hang ; i -- ) {
+						if (arr[yeolMin][i] == turn) cnt++; 
+						yeolMin++;
+					}
+
+					if (cnt == 4) { end() }
+					
+					}
 				}
-				cnt++;
 			}
+		}
 
+	function end() {
 
+		console.log("win!!!!!!!!!!!!!");
 
+		document.querySelector("#dim").style = "display:flex"
+		if(turn == 1) {
+			document.querySelector(".rock").classList.add("black")
+		}
 
 	}
 
