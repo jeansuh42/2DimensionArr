@@ -28,7 +28,8 @@ body {margin:0;}
 
 	// init 
 
-	// 룰을 먼저 적는다 -> 적어야 쪼갤 수 있다 
+	// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
+	// ※ 룰을 먼저 적는다 -> 적어야 쪼갤 수 있다 
 	// 1. 칸수는 15*15를 기본으로 한다  
 	// 2. 플레이어 둘이 턴제로 알을 놓는다.
 	// 3. 알은 빈 공간에만 둘 수 있다. 
@@ -39,8 +40,10 @@ body {margin:0;}
 	// 4/5의 공통요건
 		// 1. 탐색 범위 
 		// 2. U D fucntion -> 범위를 탐색한다: 탐색 함수 
+	// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
 
-
+	// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
+	// 나만의 코드 스타일을 가지는 게 중요하다 
 	let arr, whiteArr, blackArr;
 	let turn, arrCnt;
 
@@ -59,7 +62,11 @@ body {margin:0;}
 		turn = 1;
 		
 		// 흰색에게는 1, 검은색에게는 2를 부여한다 
-	
+
+		// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
+		// 그리는 것 -> 함수로 뺀다 
+		// 기능은 분리해야 한다 
+
 		for (const a of arr) {
 		 	for(const b of a){
 	 	 		let newOmokBox = document.createElement("div");
@@ -82,12 +89,13 @@ body {margin:0;}
 	// 영역을 클릭했을 경우, 해당 인덱스를 추출한다 
 	// 영역에 id 값을 부여하는 형식이 가장 좋을 것 같다 
 
+		// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
 		// this => 변수 받아서 처리할 것
 
 		that = this 
-		console.log(this.id); 
+		console.log(that.id); 
 
-		if(this.hasChildNodes()){ return; }
+		if(that.hasChildNodes()){ return; }
 
 		let calArr = whiteArr;
 
@@ -107,10 +115,10 @@ body {margin:0;}
 		// 1. 해당 행과 열에 연속되어 있는지 확인한다. 
 		// 2. 없다면, 해당 id 값을 배열에 더한다 
 
-		this.appendChild(rock); 
-		calArr.push(this.id);
+		that.appendChild(rock); 
+		calArr.push(that.id);
 
-		const idArr = this.id.split("-");
+		const idArr = that.id.split("-");
 		const yeol = Number(idArr[0]);
 		const hang = Number(idArr[1]);
 
