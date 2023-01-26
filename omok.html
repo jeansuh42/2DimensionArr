@@ -58,7 +58,6 @@ body {margin:0;}
 	function init(initCnt) {
 
 		arrCnt = initCnt;
-
 		arr = Array.from(Array(arrCnt), () => Array(arrCnt).fill('0'));
 
 		whiteArr = [];
@@ -66,24 +65,23 @@ body {margin:0;}
 		
 		// 흰색에게는 1, 검은색에게는 2를 부여한다 
 		turn = 1;
-
 		aIdx = 0, bIdx = 0;
 
 		// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
 		// 그리는 것 -> 함수로 뺀다 
+		document.querySelector("#dim").style.display = "none";
 		drawTable(arr);
 		// 기능은 분리해야 한다 
 		addClickFunc();
 
 		//document.querySelector("#dim").style.display = "none";
-
 	}
 
 	function drawTable(arr) {
 
 		document.querySelector("#omok-table").replaceChildren();
 		document.querySelector("#omok-table-back").replaceChildren();
-		
+
 		for (const a of arr) {
 		 	for(const b of a){
 	 	 		let newOmokBox = document.createElement("div");
