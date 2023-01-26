@@ -2,25 +2,28 @@
 <style>
 p {margin:0;}
 body {margin:0;}
-.container {width: 500px; text-align:right;}
-#omok-table { display: flex; width: 480px; flex-wrap: wrap; background-color: tan; }
-#dim { position: absolute; background-color: rgba(0,0,0,0.3); width: 480px; height: 480px; top:0; left:0; display: flex; justify-content: center; align-items: center;}
+.container {width: 525px; text-align:right;}
+#omok-table { display: flex; flex-wrap: wrap; background-color: white; width: 480px; padding-left:32px; padding-top:32px;}
+#omok-table-back { position: absolute; display: flex; flex-wrap: wrap; background-color: tan; width: 512px; left: 15px; top: 15px;}
+#omok-table-back .omok-box { border: solid 1px saddlebrown !important; }
+#dim { position: absolute; background-color: rgba(0,0,0,0.3); top:0; left:0; display: flex; justify-content: center; align-items: center; display: flex; width: 512px; height: 512px; margin: 16px; }
 #dim div { color: white; font-weight: bold; font-size: 50px; }
 #dim div p { text-align: center; }
-.omok-box { position:relative; width: 30px; height: 30px; border: solid 1px saddlebrown;}
-.omok-box p {font-size: 25px; color: transparent; text-shadow: 0 0 0 black; margin:0; position: absolute; }
+.omok-box { position:relative; width: 30px; height: 30px; border: solid 1px transparent; text-align: center; line-height: 22px;}
+.omok-box p { font-size: 25px; color: transparent; text-shadow: 0 0 0 black; margin:0;}
 .omok-box p.white { text-shadow: 0 0 0 white;}
-.btn-box {padding-top: 10px}
+.btn-box { padding-top: 30px }
 .rock.black {color:black;}
 </style>
 
 <div class="container">
+	<div id="omok-table-back"></div>
 	<div id="omok-table"></div>
-	<div id="dim" style="display:none">
+	<div id="dim" style="display: none">
 		<div><p class="rock">●</p>WIN</div>
 	</div>
 	<div class="btn-box">
-		<button>시작</button>
+		<button onclick='init(cellAmt)'>시작</button>
 	</div>
 </div>
 
@@ -46,8 +49,10 @@ body {margin:0;}
 	// 나만의 코드 스타일을 가지는 게 중요하다 
 	let arr, whiteArr, blackArr;
 	let turn, arrCnt;
+	let aIdx = 0, bIdx = 0;
+	let cellAmt = 15;
 
-	init(15);
+	init(cellAmt);
 
 	// 화면에서 2차원 배열에 해당하는 영역을 그린다 
 	function init(initCnt) {
@@ -55,32 +60,62 @@ body {margin:0;}
 		arrCnt = initCnt;
 
 		arr = Array.from(Array(arrCnt), () => Array(arrCnt).fill('0'));
-		let aIdx = 0, bIdx = 0;
 
 		whiteArr = [];
 		blackArr = [];
-		turn = 1;
 		
 		// 흰색에게는 1, 검은색에게는 2를 부여한다 
+		turn = 1;
+
+		aIdx = 0, bIdx = 0;
 
 		// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
 		// 그리는 것 -> 함수로 뺀다 
+		drawTable(arr);
 		// 기능은 분리해야 한다 
+		addClickFunc();
 
+		//document.querySelector("#dim").style.display = "none";
+
+	}
+
+	function drawTable(arr) {
+
+		document.querySelector("#omok-table").replaceChildren();
+		document.querySelector("#omok-table-back").replaceChildren();
+		
 		for (const a of arr) {
 		 	for(const b of a){
 	 	 		let newOmokBox = document.createElement("div");
-		 		let table = document.querySelector("#omok-table");
+	 	 		let table = document.querySelector("#omok-table");
 			 	newOmokBox.setAttribute("class", "omok-box");
 			 	newOmokBox.setAttribute("id", aIdx + "-" + bIdx);
+		 		table.appendChild(newOmokBox);
+
+				let newOmokTableBox = document.createElement("div");
+		 		let tableB = document.querySelector("#omok-table-back"); 
+		 		newOmokTableBox.setAttribute("class", "omok-box");
+		 		tableB.appendChild(newOmokTableBox);
+		 		//table.style.width = (cellAmt * 32) + "px"
+		 		//tableB.style.width = (cellAmt * 32) + "px"
 			 	// 기능은 분리해야 한다 
-			 	newOmokBox.onclick = clickBox;
-			 	table.appendChild(newOmokBox);
+			 	
 			 	bIdx ++;
 		 	}
 		 	aIdx ++; 
 		 	bIdx = 0;
 		}
+
+		for (i = 0 ; i <= arr.length * 2 ; i++) {
+			let addDiv = document.createElement("div");
+			addDiv.setAttribute("class", "omok-box");
+			document.querySelector("#omok-table-back").appendChild(addDiv);
+		}
+	}
+
+	function addClickFunc() {
+		let box = document.querySelectorAll("#omok-table .omok-box");
+		box.forEach ( el => el.onclick = clickBox);
 	}
 
 	function clickBox() {
@@ -92,7 +127,7 @@ body {margin:0;}
 		// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
 		// this => 변수 받아서 처리할 것
 
-		that = this 
+		const that = this 
 		console.log(that.id); 
 
 		if(that.hasChildNodes()){ return; }
@@ -118,6 +153,7 @@ body {margin:0;}
 		that.appendChild(rock); 
 		calArr.push(that.id);
 
+
 		const idArr = that.id.split("-");
 		const yeol = Number(idArr[0]);
 		const hang = Number(idArr[1]);
@@ -125,74 +161,114 @@ body {margin:0;}
 		arr[yeol][hang] = turn;
 
 		if(calArr.length >= 5){
-
-			// 열 반복 여부 
-			let cnt = 0; 
-
-			let min = yeol-4 > 0 ? yeol-4 : 0; // 열 상 
-			let max = yeol+4 < arrCnt ? yeol+4 : arrCnt; // 열 하 
-				
-			for (i = min ; i < max ; i ++) {
-				if (arr[i][hang] == turn)  cnt++;
-			}
-
-			if (cnt == 5) { 
-				end();
-			}else {
-
-				// 행 반복 여부 
-
-				cnt = 0 
-				min = hang-4 > 0 ? hang-4 : 0; // 행 상 
-				max = hang+4 < arrCnt ? hang+4 : arrCnt; // 행 하 
-
-
-				for (i = min ; i < max ; i ++) {
-					if (arr[yeol][i] == turn) cnt++;
-				}
-
-
-				if (cnt == 5) { 
-					end()
-				}else {
-
-					// 대각선 
-					let yeolMax = yeol + 4 > arrCnt ? arrCnt : yeol + 4;
-					let yeolMin = yeol - 4 < 0 ? 0 : yeol - 4;
-					let hangMax = hang + 4 > arrCnt ? arrCnt : hang + 4;
-					let hangMin = hang - 4 < 0 ? 0 : hang - 4;
-
-					const diagonalMin = `${yeolMax}-${hangMin}`
-					const diagonalMax = `${yeolMin}-${hangMax}`
-
-					for ( i = yeolMax ; i > yeol ; i -- ) {
-						if (arr[i][hangMin] == turn) cnt++;
-						hangMin++;
-					}
-
-
-					for ( i = hangMax ; i > hang ; i -- ) {
-						if (arr[yeolMin][i] == turn) cnt++; 
-						yeolMin++;
-					}
-
-					if (cnt == 4) { end() }
-					
-					}
-				}
-			}
+			distingOmokWinner(that.id)
 		}
+	}
+
+	function distingOmokWinner(id){
+
+	const idArr = id.split("-");
+	const yeol = Number(idArr[0]);
+	const hang = Number(idArr[1]);
+
+	let direct = [[0,1], [1,0], [1,1], [-1,1]];
+
+	// 열(H) / 행(V) / 대각선 오른쪽(DR) / 대각선 왼쪽 (DL)
+
+		for (k = 0; k < 4; k++) {
+			let ax = yeol;
+			let ay = hang;
+			let matchCnt = 1;
+			
+			
+			for (z = 0; z < 4; z++) {
+			// 증가
+				ax += direct[k][0];
+				ay += direct[k][1];
+				if ( 0 <= ax && ax < arrCnt && 0 <= ay && ay < arrCnt) {
+					if(turn == arr[ax][ay]) matchCnt ++;
+				}
+			}
+
+			// 재탐색을 위한 갱신 
+			ax = yeol;
+			ay = hang;
+
+			for (z = 0; z < 4; z++) {
+			// 감소
+				ax -= direct[k][0];
+				ay -= direct[k][1];
+				if ( 0 <= ax && ax < arrCnt && 0 <= ay && ay < arrCnt) {
+					if(turn == arr[ax][ay]) matchCnt ++;
+				}
+			}
+			
+			if (matchCnt == 5) {
+				end();
+				return;
+			}
+			
+		}
+
+
+	}
+
 
 	function end() {
 
 		console.log("win!!!!!!!!!!!!!");
 
-		document.querySelector("#dim").style = "display:flex"
+		console.log(arr)
+
+		let dim = document.querySelector("#dim");
+		dim.style.display = "flex";
+		dim.style.width = ((cellAmt+1) * 32) + "px";
+		dim.style.height = ((cellAmt+1) * 32) + "px";
 		if(turn == 1) {
 			document.querySelector(".rock").classList.add("black")
 		}
 
 	}
+
+
+
+	/*
+	// ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ ※ 
+	var Game = function() {
+
+		this.init = function() {
+	
+		}
+	
+		this.draw = {
+	
+		}	
+		this.event = {
+	
+		}	
+		this.role = {
+	
+		}
+	}
+	
+	Game.prototype.start = function() {
+	
+	}
+
+
+	let game = new Game();
+
+	game.start();
+	game.reset();
+
+	
+	FPS
+	- 제어와 그리는 부분이 나뉘어야함.
+
+	*/
+
+
+
 
 </script>
 
